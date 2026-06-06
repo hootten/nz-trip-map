@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>NZ Trip Route Map - 4 Week Itinerary</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylineDecorator.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            overflow: hidden;
+        }
+        
+        #map {
+            width: 100vw;
+            height: 100vh;
+            transition: width 0.3s ease;
+        }
+        
+        #map.with-panel {
+            width: calc(100vw - 400px);
+        }
+        
+        .numbered-marker {
+            background-color: white;
+            border: 3px solid;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            transition: all 0.2s ease;
+        }
+        
+        .numbered-marker.highlighted {
+            width: 38px;
+            height: 38px;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            transform: scale(1.2);
+        }
+        
+        .legend {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            line-height: 1.8;
+        }
+        
+        .legend h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            margin-right: 8px;
+        }
+        
+        /* Line label styles */
+        .line-label {
+            background: white;
+            border: 2px solid;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            white-space: nowrap;
+        }
+        
+        /* Itinerary Panel Styles */
+        #itinerary-panel {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.3);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #itinerary-panel.open {
+            transform: translateX(0);
+        }
+        
+        #panel-header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #close-panel {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background 0.2s;
+        }
+        
+        #close-panel:hover {
+            background: rgba(255,255,255,0.35);
+        }
+        
+        #panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .week-section {
+            margin-bottom: 30px;
+        }
+        
+        .week-header {
+            font-weight: bold;
+            font-size: 16px;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .week-1 { background: #ef4444; }
+        .week-2 { background: #f59e0b; }
+        .week-3 { background: #10b981; }
+        .week-4 { background: #6366f1; }
+        
+        .day-item {
+            padding: 12px;
+            margin: 8px 0;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .day-item:hover {
+            background: #f1f5f9;
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .day-item.highlighted {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+            box-shadow: 0 2px 12px rgba(245, 158, 11, 0.25);
+        }
+        
+        .day-date {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .day-location {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        /* Toggle Button */
+        #toggle-panel {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            z-index: 999;
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        #toggle-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+        }
+        
+        #toggle-panel.hidden {
+            display: none;
+        }
+        
+        /* Booking Checklist Styles */
+        .panel-tabs {
+            display: flex;
+            background: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .panel-tab {
+            flex: 1;
+            padding: 14px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            color: #64748b;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .panel-tab:hover {
+            background: #e2e8f0;
+            color: #334155;
+        }
+        
+        .panel-tab.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+            background: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .booking-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: #ffffff;
+            border-radius: 10px;
+            border-left: 4px solid #3b82f6;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .booking-item:hover {
+            background: #f8fafc;
+            transform: translateX(3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .booking-item.completed {
+            opacity: 0.65;
+            border-left-color: #10b981;
+            background: #f0fdf4;
+        }
+        
+        .booking-item.completed .booking-title {
+            text-decoration: line-through;
+            color: #6b7280;
+        }
+        
+        .booking-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .booking-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin-top: 2px;
+        }
+        
+        .booking-content {
+            flex: 1;
+        }
+        
+        .booking-date {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+        
+        .booking-title {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        
+        .booking-details {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .booking-section-header {
+            font-weight: 700;
+            font-size: 14px;
+            color: #2563eb;
+            margin: 25px 0 12px 0;
+            padding: 10px 0 8px 0;
+            border-bottom: 2px solid #3b82f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .month-total {
+            font-size: 15px;
+            color: #10b981;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <button id="toggle-panel">📋 Menu</button>
+    <div id="map"></div>
+    
+    <div id="itinerary-panel">
+        <div id="panel-header">
+            <span>🗺️ NZ Trip Planner</span>
+            <button id="close-panel">×</button>
+        </div>
+        <div class="panel-tabs">
+            <button class="panel-tab active" data-tab="itinerary">📅 Itinerary</button>
+            <button class="panel-tab" data-tab="booking">✅ Booking Checklist</button>
+        </div>
+        <div id="panel-content">
+            <div id="itinerary-content" class="tab-content active">
+                <!-- Itinerary will be populated by JavaScript -->
+            </div>
+            <div id="booking-content" class="tab-content">
+                <!-- Booking checklist will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize map
+        var map = L.map('map').setView([-42.5, 171.5], 6);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
+        
+        // Store markers for highlighting
+        var markers = [];
+        var markerElements = [];
+
+        var routePoints = [
+            {lat: -43.532, lng: 172.637, name: "Christchurch", date: "Feb 21", activity: "Arrival - Campervan pickup", week: 1, drive_miles: null, drive_hrs: null},
+            {lat: -44.004, lng: 170.477, name: "Lake Tekapo", date: "Feb 21", activity: "Base camp - stunning turquoise waters", week: 1, drive_miles: 140, drive_hrs: 3.0},
+            {lat: -43.404, lng: 170.922, name: "Mt Sunday (Edoras)", date: "Feb 22", activity: "Tussock run - Golden Hall location", week: 1, drive_miles: 45, drive_hrs: 1.0},
+            {lat: -43.734, lng: 170.098, name: "Mt Cook Village", date: "Feb 23", activity: "Hooker Valley Track (10km flat)", week: 1, drive_miles: 35, drive_hrs: 0.75},
+            {lat: -44.004, lng: 170.477, name: "Lake Tekapo", date: "Feb 24-25", activity: "Recovery days - foam rolling & short jogs", week: 1, drive_miles: 35, drive_hrs: 0.75},
+            {lat: -43.532, lng: 172.637, name: "Christchurch", date: "Feb 26-28", activity: "Race prep & Half Marathon", week: 1, drive_miles: 140, drive_hrs: 3.0},
+            
+            {lat: -45.415, lng: 167.718, name: "Te Anau", date: "Mar 1", activity: "Hot tubs & base camp", week: 2, drive_miles: 310, drive_hrs: 5.0},
+            {lat: -44.672, lng: 167.927, name: "Milford Sound", date: "Mar 2 AM", activity: "Fjord cruise - waterfalls", week: 2, drive_miles: 75, drive_hrs: 2.0},
+            {lat: -45.415, lng: 167.718, name: "Te Anau", date: "Mar 2 PM", activity: "Glowworm Caves", week: 2, drive_miles: 75, drive_hrs: 2.0},
+            {lat: -45.032, lng: 168.662, name: "Kepler Track", date: "Mar 3", activity: "River Anduin 12km run", week: 2, drive_miles: 30, drive_hrs: 0.5},
+            {lat: -44.697, lng: 169.137, name: "Wanaka", date: "Mar 4", activity: "Roys Peak (16km/1200m)", week: 2, drive_miles: 75, drive_hrs: 1.5},
+            {lat: -44.848, lng: 168.398, name: "Paradise Forest", date: "Mar 5", activity: "Lothlórien woods walk", week: 2, drive_miles: 35, drive_hrs: 0.75},
+            {lat: -45.031, lng: 168.663, name: "Queenstown", date: "Mar 5-7", activity: "Fergburger, 20-miler, Ben Lomond", week: 2, drive_miles: 30, drive_hrs: 0.5},
+            
+            {lat: -44.000, lng: 169.250, name: "Haast Pass", date: "Mar 8", activity: "Blue Pools recovery walk", week: 3, drive_miles: 90, drive_hrs: 2.0},
+            {lat: -43.387, lng: 170.183, name: "Franz Josef", date: "Mar 9", activity: "Alex Knob Track (17km)", week: 3, drive_miles: 75, drive_hrs: 1.5},
+            {lat: -42.113, lng: 171.327, name: "Punakaiki", date: "Mar 10", activity: "Pancake Rocks coastal loops", week: 3, drive_miles: 90, drive_hrs: 2.0},
+            {lat: -41.270, lng: 173.284, name: "Nelson", date: "Mar 10", activity: "Rest & refuel", week: 3, drive_miles: 135, drive_hrs: 2.5},
+            {lat: -40.817, lng: 172.964, name: "Abel Tasman", date: "Mar 11", activity: "25km coastal single-track run", week: 3, drive_miles: 35, drive_hrs: 1.0},
+            {lat: -41.270, lng: 173.284, name: "Nelson", date: "Mar 12", activity: "Ring maker visit", week: 3, drive_miles: 35, drive_hrs: 1.0},
+            {lat: -41.244, lng: 173.968, name: "Picton", date: "Mar 13", activity: "Ferry departure to North Island", week: 3, drive_miles: 65, drive_hrs: 1.5},
+            {lat: -41.277, lng: 174.777, name: "Wellington", date: "Mar 13-14", activity: "Weta Workshop tour", week: 3, drive_miles: null, drive_hrs: 3.5},
+            
+            {lat: -41.160, lng: 175.326, name: "Putangirua Pinnacles", date: "Mar 15", activity: "Paths of the Dead hike", week: 4, drive_miles: 50, drive_hrs: 1.5},
+            {lat: -39.140, lng: 175.565, name: "Tongariro", date: "Mar 16-17", activity: "Mt Doom - Alpine Crossing", week: 4, drive_miles: 140, drive_hrs: 3.0},
+            {lat: -38.684, lng: 176.070, name: "Taupo", date: "Mar 18", activity: "15,000ft Skydive", week: 4, drive_miles: 30, drive_hrs: 0.5},
+            {lat: -38.137, lng: 176.251, name: "Rotorua", date: "Mar 19", activity: "Redwoods run & Māori Hāngī", week: 4, drive_miles: 50, drive_hrs: 1.0},
+            {lat: -37.871, lng: 175.683, name: "Hobbiton (Matamata)", date: "Mar 20", activity: "Movie set tour - Green Dragon", week: 4, drive_miles: 40, drive_hrs: 1.0},
+            {lat: -37.008, lng: 174.792, name: "Auckland", date: "Mar 21", activity: "Departure", week: 4, drive_miles: 110, drive_hrs: 2.0}
+        ];
+
+        var weekColors = {
+            1: '#ef4444',
+            2: '#f59e0b',
+            3: '#10b981',
+            4: '#6366f1'
+        };
+
+        var usedCoordinates = {};
+        var displayCoordinates = [];
+        
+        routePoints.forEach(function(point) {
+            var lat = point.lat;
+            var lng = point.lng;
+            
+            var coordKey = lat.toFixed(2) + ',' + lng.toFixed(2);
+            if (usedCoordinates[coordKey]) {
+                var offsetCount = usedCoordinates[coordKey];
+                lat += 0.025 * offsetCount;
+                lng += 0.025 * offsetCount;
+                usedCoordinates[coordKey]++;
+            } else {
+                usedCoordinates[coordKey] = 1;
+            }
+            
+            displayCoordinates.push({lat: lat, lng: lng});
+        });
+        
+        routePoints.forEach(function(point, index) {
+            var color = weekColors[point.week];
+            var stopNumber = index + 1;
+            var displayCoord = displayCoordinates[index];
+            
+            var customIcon = L.divIcon({
+                className: 'custom-marker',
+                html: '<div class="numbered-marker" id="marker-' + index + '" style="border-color: ' + color + '; color: ' + color + ';">' + stopNumber + '</div>',
+                iconSize: [28, 28],
+                iconAnchor: [14, 14]
+            });
+            
+            var marker = L.marker([displayCoord.lat, displayCoord.lng], {icon: customIcon}).addTo(map);
+            marker.bindPopup('<b>Stop ' + stopNumber + ': ' + point.name + '</b><br>' + 
+                           '<i>' + point.date + '</i><br>' + 
+                           point.activity);
+            
+            // Store marker reference
+            markers[index] = marker;
+            
+            // Add click event to marker
+            marker.on('click', function() {
+                highlightItineraryItem(index);
+            });
+            
+            if (index < routePoints.length - 1) {
+                var nextDisplayCoord = displayCoordinates[index + 1];
+                var nextPoint = routePoints[index + 1];
+                var line = L.polyline(
+                    [[displayCoord.lat, displayCoord.lng], [nextDisplayCoord.lat, nextDisplayCoord.lng]], 
+                    {
+                        color: color,
+                        weight: 3,
+                        opacity: 0.7,
+                        dashArray: point.week !== routePoints[index + 1].week ? '10, 10' : null
+                    }
+                ).addTo(map);
+                
+                // Add journey information label on the line
+                if (nextPoint.drive_miles !== null && nextPoint.drive_hrs !== null) {
+                    var hrsText = nextPoint.drive_hrs === 1 ? '1 hr' : (nextPoint.drive_hrs % 1 === 0 ? nextPoint.drive_hrs + ' hrs' : nextPoint.drive_hrs + ' hrs');
+                    var labelText = nextPoint.drive_miles + ' mi · ' + hrsText;
+                    var labelIcon = nextPoint.drive_miles === null ? '⛴️' : '🚗';
+                    
+                    line.bindTooltip(labelIcon + ' ' + labelText, {
+                        permanent: false,
+                        direction: 'center',
+                        className: 'line-label',
+                        offset: [0, 0]
+                    });
+                    
+                    // Style the tooltip border to match the line color
+                    line.on('tooltipopen', function(e) {
+                        var tooltip = e.tooltip.getElement();
+                        if (tooltip) {
+                            tooltip.style.borderColor = color;
+                            tooltip.style.color = color;
+                        }
+                    });
+                } else if (nextPoint.drive_hrs !== null) {
+                    // Ferry case
+                    var hrsText = nextPoint.drive_hrs === 1 ? '1 hr' : (nextPoint.drive_hrs % 1 === 0 ? nextPoint.drive_hrs + ' hrs' : nextPoint.drive_hrs + ' hrs');
+                    var labelText = hrsText + ' ferry';
+                    
+                    line.bindTooltip('⛴️ ' + labelText, {
+                        permanent: false,
+                        direction: 'center',
+                        className: 'line-label',
+                        offset: [0, 0]
+                    });
+                    
+                    line.on('tooltipopen', function(e) {
+                        var tooltip = e.tooltip.getElement();
+                        if (tooltip) {
+                            tooltip.style.borderColor = color;
+                            tooltip.style.color = color;
+                        }
+                    });
+                }
+                
+                var decorator = L.polylineDecorator(line, {
+                    patterns: [{
+                        offset: '50%',
+                        repeat: 0,
+                        symbol: L.Symbol.arrowHead({
+                            pixelSize: 12,
+                            polygon: true,
+                            pathOptions: {
+                                fillOpacity: 1,
+                                weight: 0,
+                                color: color
+                            }
+                        })
+                    }]
+                }).addTo(map);
+            }
+        });
+
+        var legend = L.control({position: 'bottomright'});
+        legend.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'legend');
+            div.innerHTML = '<h4>4-Week NZ Itinerary</h4>';
+            div.innerHTML += '<div class="legend-item"><div class="legend-color" style="background: #ef4444;"></div>Week 1: Taper & Race (Feb 21-28)</div>';
+            div.innerHTML += '<div class="legend-item"><div class="legend-color" style="background: #f59e0b;"></div>Week 2: Deep South (Mar 1-7)</div>';
+            div.innerHTML += '<div class="legend-item"><div class="legend-color" style="background: #10b981;"></div>Week 3: West Coast (Mar 8-14)</div>';
+            div.innerHTML += '<div class="legend-item"><div class="legend-color" style="background: #6366f1;"></div>Week 4: Mordor & Shire (Mar 15-21)</div>';
+            div.innerHTML += '<br><small>Click markers for details</small>';
+            return div;
+        };
+        legend.addTo(map);
+
+        var group = new L.featureGroup(routePoints.map(p => L.marker([p.lat, p.lng])));
+        map.fitBounds(group.getBounds().pad(0.1));
+        
+        // Itinerary data from the initial-plan document
+        var itineraryData = {
+            1: [
+                {date: "Feb 21 AM", location: "Christchurch", description: "Arrival - Pick up campervan from airport", markerIndex: 0},
+                {date: "Feb 21 PM", location: "Lake Tekapo", description: "Drive to base camp - stunning turquoise waters", markerIndex: 1, drive_miles: 140, drive_hrs: 3.0},
+                {date: "Feb 22", location: "Mt Sunday (Edoras)", description: "The Tussock Run - 1.5hr fast-hike to Golden Hall summit", markerIndex: 2, drive_miles: 45, drive_hrs: 1.0},
+                {date: "Feb 23", location: "Mt Cook Village", description: "Hooker Valley Track (10km flat) - Jaw-dropping alpine views", markerIndex: 3, drive_miles: 35, drive_hrs: 0.75},
+                {date: "Feb 24-25", location: "Lake Tekapo", description: "Hydrate & Relax - Foam rolling, short 20min flat jogs", markerIndex: 4, drive_miles: 35, drive_hrs: 0.75},
+                {date: "Feb 26-27", location: "Christchurch", description: "Carbo-Loading - Collect race bib, prep gear", markerIndex: 5, drive_miles: 140, drive_hrs: 3.0},
+                {date: "Feb 28", location: "Christchurch", description: "RACE DAY - Christchurch Motorway Half Marathon", markerIndex: 5}
+            ],
+            2: [
+                {date: "Mar 1", location: "Te Anau", description: "Muscle Flush - Soak legs in lakeside hot tubs", markerIndex: 6, drive_miles: 310, drive_hrs: 5.0},
+                {date: "Mar 2 AM", location: "Milford Sound", description: "Fjord cruise - Towering waterfalls and sheer cliffs", markerIndex: 7, drive_miles: 75, drive_hrs: 2.0},
+                {date: "Mar 2 PM", location: "Te Anau", description: "Glowworm Caves - 12,000-year-old underground cave network", markerIndex: 8, drive_miles: 75, drive_hrs: 2.0},
+                {date: "Mar 3", location: "Kepler Track", description: "River Anduin - Flat 12km out-and-back run", markerIndex: 9, drive_miles: 30, drive_hrs: 0.5},
+                {date: "Mar 4", location: "Wanaka", description: "Roys Peak - 16km / 1,200m vertical gain (walk down slowly!)", markerIndex: 10, drive_miles: 75, drive_hrs: 1.5},
+                {date: "Mar 5 AM", location: "Paradise Forest", description: "Lothlórien woods walk", markerIndex: 11, drive_miles: 35, drive_hrs: 0.75},
+                {date: "Mar 5 PM", location: "Queenstown", description: "Arrive Queenstown - Fergburger dinner!", markerIndex: 12, drive_miles: 30, drive_hrs: 0.5},
+                {date: "Mar 6", location: "Queenstown", description: "THE PEAK ROAD RUN - 32km (20-mile) long slow distance", markerIndex: 12},
+                {date: "Mar 7", location: "Queenstown", description: "Ben Lomond Summit via Gondola Hack + sports massage", markerIndex: 12}
+            ],
+            3: [
+                {date: "Mar 8", location: "Haast Pass", description: "West Coast Transit - Blue Pools recovery stroll", markerIndex: 13, drive_miles: 90, drive_hrs: 2.0},
+                {date: "Mar 9", location: "Franz Josef", description: "Alex Knob Track - 17km / 1,100m through rainforest", markerIndex: 14, drive_miles: 75, drive_hrs: 1.5},
+                {date: "Mar 10 AM", location: "Punakaiki", description: "Pancake Rocks coastal loops", markerIndex: 15, drive_miles: 90, drive_hrs: 2.0},
+                {date: "Mar 10 PM", location: "Nelson", description: "Drive to Nelson - Rest & refuel", markerIndex: 16, drive_miles: 135, drive_hrs: 2.5},
+                {date: "Mar 11", location: "Abel Tasman", description: "THRESHOLD RUN - 25km coastal single-track", markerIndex: 17, drive_miles: 35, drive_hrs: 1.0},
+                {date: "Mar 12", location: "Nelson", description: "Rest & visit Jens Hansen Goldsmiths (Ring Maker)", markerIndex: 18, drive_miles: 35, drive_hrs: 1.0},
+                {date: "Mar 13 AM", location: "Picton", description: "Drive to Picton for ferry", markerIndex: 19, drive_miles: 65, drive_hrs: 1.5},
+                {date: "Mar 13 PM", location: "Wellington", description: "Arrive Wellington via Interislander Ferry (3.5 hours)", markerIndex: 20, drive_miles: null, drive_hrs: 3.5},
+                {date: "Mar 14", location: "Wellington", description: "Weta Workshop tour + Mt Victoria recovery jog", markerIndex: 20}
+            ],
+            4: [
+                {date: "Mar 15", location: "Putangirua Pinnacles", description: "Paths of the Dead - Fast-hike through eerie rock pillars", markerIndex: 21, drive_miles: 50, drive_hrs: 1.5},
+                {date: "Mar 16", location: "Tongariro", description: "Transit to Mordor - Drive Desert Road, set up camp", markerIndex: 22, drive_miles: 140, drive_hrs: 3.0},
+                {date: "Mar 17", location: "Tongariro Alpine Crossing", description: "Mt Doom - 19.4km crossing of volcanic craters (no running!)", markerIndex: 22},
+                {date: "Mar 18", location: "Taupo", description: "THE SKYDIVE - 15,000ft over Lake Taupo", markerIndex: 23, drive_miles: 30, drive_hrs: 0.5},
+                {date: "Mar 19", location: "Rotorua", description: "Redwoods 10km recovery run + Māori Hāngī dinner", markerIndex: 24, drive_miles: 50, drive_hrs: 1.0},
+                {date: "Mar 20", location: "Hobbiton (Matamata)", description: "The Shire - Movie set tour, Green Dragon ginger beer", markerIndex: 25, drive_miles: 40, drive_hrs: 1.0},
+                {date: "Mar 21", location: "Auckland", description: "Departure - Fly back to London, taper begins!", markerIndex: 26, drive_miles: 110, drive_hrs: 2.0}
+            ]
+        };
+        
+        // Populate itinerary panel
+        function populateItinerary() {
+            var content = document.getElementById('itinerary-content');
+            content.innerHTML = '';
+            
+            for (var week in itineraryData) {
+                var weekSection = document.createElement('div');
+                weekSection.className = 'week-section';
+                
+                var weekHeader = document.createElement('div');
+                weekHeader.className = 'week-header week-' + week;
+                var weekTitles = {
+                    1: 'Week 1: Taper & Race (Feb 21-28)',
+                    2: 'Week 2: Deep South Magic (Mar 1-7)',
+                    3: 'Week 3: Glaciers & Single-Track (Mar 8-14)',
+                    4: 'Week 4: Mordor & The Shire (Mar 15-21)'
+                };
+                weekHeader.textContent = weekTitles[week];
+                weekSection.appendChild(weekHeader);
+                
+                itineraryData[week].forEach(function(day, idx) {
+                    var dayItem = document.createElement('div');
+                    dayItem.className = 'day-item';
+                    dayItem.setAttribute('data-marker', day.markerIndex);
+                    
+                    var dayDate = document.createElement('div');
+                    dayDate.className = 'day-date';
+                    dayDate.textContent = day.date + ' - ' + day.location;
+                    
+                    var dayLocation = document.createElement('div');
+                    dayLocation.className = 'day-location';
+                    dayLocation.textContent = day.description;
+                    
+                    dayItem.appendChild(dayDate);
+                    dayItem.appendChild(dayLocation);
+                    
+                    // Add click event
+                    dayItem.addEventListener('click', function() {
+                        var markerIdx = parseInt(this.getAttribute('data-marker'));
+                        highlightMarker(markerIdx);
+                        
+                        // Pan to marker
+                        if (markers[markerIdx]) {
+                            markers[markerIdx].openPopup();
+                            map.setView(markers[markerIdx].getLatLng(), 10);
+                        }
+                    });
+                    
+                    weekSection.appendChild(dayItem);
+                });
+                
+                content.appendChild(weekSection);
+            }
+        }
+        
+        // Highlight marker from itinerary
+        function highlightMarker(index) {
+            // Remove all highlights
+            document.querySelectorAll('.numbered-marker').forEach(function(el) {
+                el.classList.remove('highlighted');
+            });
+            document.querySelectorAll('.day-item').forEach(function(el) {
+                el.classList.remove('highlighted');
+            });
+            
+            // Highlight marker
+            var markerEl = document.getElementById('marker-' + index);
+            if (markerEl) {
+                markerEl.classList.add('highlighted');
+                
+                // Highlight corresponding itinerary items
+                document.querySelectorAll('[data-marker="' + index + '"]').forEach(function(el) {
+                    el.classList.add('highlighted');
+                });
+            }
+        }
+        
+        // Highlight itinerary from marker
+        function highlightItineraryItem(index) {
+            highlightMarker(index);
+            
+            // Scroll to itinerary item if panel is open
+            var panel = document.getElementById('itinerary-panel');
+            if (panel.classList.contains('open')) {
+                var items = document.querySelectorAll('[data-marker="' + index + '"]');
+                if (items.length > 0) {
+                    items[0].scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+            }
+        }
+        
+        // Panel toggle functionality
+        var toggleBtn = document.getElementById('toggle-panel');
+        var closeBtn = document.getElementById('close-panel');
+        var panel = document.getElementById('itinerary-panel');
+        var mapEl = document.getElementById('map');
+        
+        toggleBtn.addEventListener('click', function() {
+            panel.classList.add('open');
+            mapEl.classList.add('with-panel');
+            toggleBtn.classList.add('hidden');
+            setTimeout(function() {
+                map.invalidateSize();
+            }, 300);
+        });
+        
+        closeBtn.addEventListener('click', function() {
+            panel.classList.remove('open');
+            mapEl.classList.remove('with-panel');
+            toggleBtn.classList.remove('hidden');
+            
+            // Clear highlights
+            document.querySelectorAll('.numbered-marker').forEach(function(el) {
+                el.classList.remove('highlighted');
+            });
+            document.querySelectorAll('.day-item').forEach(function(el) {
+                el.classList.remove('highlighted');
+            });
+            
+            setTimeout(function() {
+                map.invalidateSize();
+            }, 300);
+        });
+        
+        // Initialize itinerary
+        populateItinerary();
+        
+        // Booking checklist data
+        var bookingTasks = [
+            {date: "Aug 2026", title: "Enter the Race", details: "Register for Christchurch Motorway Half Marathon (Feb 28, 2027). Early-bird registration ~£38.", id: "race", cost: 38},
+            {date: "Sep 2026", title: "Book Flights", details: "Multi-city ticket: London → Christchurch, Auckland → London. Target: £1,350. Look for deals on Skyscanner.", id: "flights", cost: 1350},
+            {date: "Sep 2026", title: "Book Campervan", details: "28 days, 2-berth, Green Warrant certified van. Target: £1,800. Compare prices on Motorhome Republic.", id: "campervan", cost: 1800},
+            {date: "Nov 2026", title: "Book Interislander Ferry", details: "Picton → Wellington (Mar 13, 2027). Northbound Saver fare for solo adult + campervan. ~£180.", id: "ferry", cost: 180},
+            {date: "Dec 2026", title: "Pre-book Queenstown Campsites", details: "Holiday Parks for Mar 5-7. Queenstown fills up in late summer - book early!", id: "queenstown-camp", cost: 0},
+            {date: "Dec 2026", title: "Pre-book Tongariro Campsite", details: "Holiday Park near Tongariro (Mar 16-17). Essential for Alpine Crossing shuttle access.", id: "tongariro-camp", cost: 0},
+            {date: "Jan 2027", title: "Book Hobbiton Tour", details: "Matamata movie set tour (Mar 20). Book morning slot. ~£65.", id: "hobbiton", cost: 65},
+            {date: "Jan 2027", title: "Book Queenstown Gondola", details: "Skyline Gondola pass for Ben Lomond hack (Mar 7). ~£35.", id: "gondola", cost: 35},
+            {date: "Jan 2027", title: "Book Milford Sound Cruise", details: "Nature cruise (Mar 2 AM). Book with Real Journeys or similar. ~£85.", id: "milford", cost: 85},
+            {date: "Jan 2027", title: "Book Te Anau Glowworm Caves", details: "Evening boat tour into caves (Mar 2 PM). ~£45.", id: "glowworm", cost: 45},
+            {date: "Jan 2027", title: "Book Taupo Skydive", details: "15,000ft tandem skydive over Lake Taupo (Mar 18). ~£200. Book with Taupo Tandem Skydiving.", id: "skydive", cost: 200},
+            {date: "Jan 2027", title: "Book Te Puia Māori Experience", details: "Cultural performance + plant-based Hāngī dinner in Rotorua (Mar 19). ~£85.", id: "maori", cost: 85},
+            {date: "Jan 2027", title: "Book Weta Workshop Tour", details: "Behind-the-scenes tour in Wellington (Mar 14). ~£30.", id: "weta", cost: 30},
+            {date: "Jan 2027", title: "Book Sports Massage", details: "60-90 min session in Queenstown for evening of Mar 7 (post-20-miler recovery). ~£75-150.", id: "massage", cost: 110},
+            {date: "Jan 2027", title: "Get Travel Insurance", details: "Medical sports insurance covering marathon training, hiking, and adventure activities. Include PLB tracker if doing remote hikes.", id: "insurance", cost: 0}
+        ];
+        
+        // Populate booking checklist
+        function populateBookingChecklist() {
+            var content = document.getElementById('booking-content');
+            content.innerHTML = '';
+            
+            var currentMonth = '';
+            var monthTotal = 0;
+            var monthTasks = [];
+            
+            // Calculate totals per month
+            var monthTotals = {};
+            bookingTasks.forEach(function(task) {
+                if (!monthTotals[task.date]) {
+                    monthTotals[task.date] = 0;
+                }
+                monthTotals[task.date] += task.cost;
+            });
+            
+            bookingTasks.forEach(function(task, index) {
+                // Add month header if new month
+                if (task.date !== currentMonth) {
+                    var monthHeader = document.createElement('div');
+                    monthHeader.className = 'booking-section-header';
+                    
+                    var monthTitle = document.createElement('span');
+                    monthTitle.textContent = task.date;
+                    
+                    var monthCost = document.createElement('span');
+                    monthCost.className = 'month-total';
+                    var total = monthTotals[task.date];
+                    if (total > 0) {
+                        monthCost.textContent = '£' + total.toLocaleString();
+                    } else {
+                        monthCost.textContent = 'TBD';
+                    }
+                    
+                    monthHeader.appendChild(monthTitle);
+                    monthHeader.appendChild(monthCost);
+                    content.appendChild(monthHeader);
+                    currentMonth = task.date;
+                }
+                
+                var bookingItem = document.createElement('div');
+                bookingItem.className = 'booking-item';
+                bookingItem.setAttribute('data-id', task.id);
+                
+                var bookingHeader = document.createElement('div');
+                bookingHeader.className = 'booking-header';
+                
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'booking-checkbox';
+                checkbox.setAttribute('data-id', task.id);
+                
+                // Load saved state from localStorage
+                var savedState = localStorage.getItem('booking-' + task.id);
+                if (savedState === 'true') {
+                    checkbox.checked = true;
+                    bookingItem.classList.add('completed');
+                }
+                
+                checkbox.addEventListener('change', function() {
+                    var parentItem = this.closest('.booking-item');
+                    if (this.checked) {
+                        parentItem.classList.add('completed');
+                        localStorage.setItem('booking-' + task.id, 'true');
+                    } else {
+                        parentItem.classList.remove('completed');
+                        localStorage.setItem('booking-' + task.id, 'false');
+                    }
+                });
+                
+                var bookingContent = document.createElement('div');
+                bookingContent.className = 'booking-content';
+                
+                var bookingTitle = document.createElement('div');
+                bookingTitle.className = 'booking-title';
+                bookingTitle.textContent = task.title;
+                
+                var bookingDetails = document.createElement('div');
+                bookingDetails.className = 'booking-details';
+                bookingDetails.textContent = task.details;
+                
+                bookingContent.appendChild(bookingTitle);
+                bookingContent.appendChild(bookingDetails);
+                
+                bookingHeader.appendChild(checkbox);
+                bookingHeader.appendChild(bookingContent);
+                bookingItem.appendChild(bookingHeader);
+                
+                content.appendChild(bookingItem);
+            });
+        }
+        
+        populateBookingChecklist();
+        
+        // Tab switching functionality
+        document.querySelectorAll('.panel-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                var tabName = this.getAttribute('data-tab');
+                
+                // Update active tab
+                document.querySelectorAll('.panel-tab').forEach(function(t) {
+                    t.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Update active content
+                document.querySelectorAll('.tab-content').forEach(function(content) {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tabName + '-content').classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
