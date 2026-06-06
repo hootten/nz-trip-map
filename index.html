@@ -54,6 +54,34 @@
             border-radius: 5px;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             line-height: 1.8;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        .legend.mobile-hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+        }
+        
+        #legend-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 998;
+            background: white;
+            color: #2563eb;
+            border: 2px solid #2563eb;
+            padding: 10px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+        }
+        
+        #legend-toggle:active {
+            transform: scale(0.95);
         }
         
         .legend h4 {
@@ -348,6 +376,22 @@
         
         /* Mobile-Friendly Responsive Styles */
         @media (max-width: 768px) {
+            .legend {
+                opacity: 0;
+                pointer-events: none;
+                transform: translateY(20px);
+            }
+            
+            .legend.mobile-visible {
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateY(0);
+            }
+            
+            #legend-toggle {
+                display: block;
+            }
+            
             #itinerary-panel {
                 width: 100vw;
                 transform: translateX(100vw);
@@ -395,6 +439,7 @@
 </head>
 <body>
     <button id="toggle-panel">📋 Menu</button>
+    <button id="legend-toggle">📍 Legend</button>
     <div id="map"></div>
     
     <div id="itinerary-panel">
@@ -741,6 +786,21 @@
         var closeBtn = document.getElementById('close-panel');
         var panel = document.getElementById('itinerary-panel');
         var mapEl = document.getElementById('map');
+        
+        // Legend toggle for mobile
+        var legendToggleBtn = document.getElementById('legend-toggle');
+        var legendElement = null;
+        
+        // Find the legend element after it's added to the map
+        setTimeout(function() {
+            legendElement = document.querySelector('.legend');
+        }, 100);
+        
+        legendToggleBtn.addEventListener('click', function() {
+            if (legendElement) {
+                legendElement.classList.toggle('mobile-visible');
+            }
+        });
         
         toggleBtn.addEventListener('click', function() {
             panel.classList.add('open');
