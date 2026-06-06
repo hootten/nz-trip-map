@@ -220,6 +220,48 @@
             line-height: 1.5;
         }
         
+        .day-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 8px;
+            padding-top: 0;
+            border-top: 1px solid transparent;
+        }
+        
+        .day-item.expanded .day-details {
+            max-height: 800px;
+            padding-top: 8px;
+            border-top-color: #e2e8f0;
+        }
+        
+        .day-details ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        
+        .day-details li {
+            margin: 4px 0;
+        }
+        
+        .day-details strong {
+            color: #1e293b;
+        }
+        
+        .expand-icon {
+            float: right;
+            font-size: 12px;
+            color: #94a3b8;
+            transition: transform 0.3s ease;
+        }
+        
+        .day-item.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+        
         /* Toggle Button */
         #toggle-panel {
             position: fixed;
@@ -656,44 +698,45 @@
         // Itinerary data from the initial-plan document
         var itineraryData = {
             1: [
-                {date: "Feb 21 AM", location: "Christchurch", description: "Arrival - Pick up campervan from airport", markerIndex: 0},
-                {date: "Feb 21 PM", location: "Lake Tekapo", description: "Drive to base camp - stunning turquoise waters", markerIndex: 1, drive_miles: 140, drive_hrs: 3.0},
-                {date: "Feb 22", location: "Mt Sunday (Edoras)", description: "The Tussock Run - 1.5hr fast-hike to Golden Hall summit", markerIndex: 2, drive_miles: 45, drive_hrs: 1.0},
-                {date: "Feb 23", location: "Mt Cook Village", description: "Hooker Valley Track (10km flat) - Jaw-dropping alpine views", markerIndex: 3, drive_miles: 35, drive_hrs: 0.75},
-                {date: "Feb 24-25", location: "Lake Tekapo", description: "Hydrate & Relax - Foam rolling, short 20min flat jogs", markerIndex: 4, drive_miles: 35, drive_hrs: 0.75},
-                {date: "Feb 26-27", location: "Christchurch", description: "Carbo-Loading - Collect race bib, prep gear", markerIndex: 5, drive_miles: 140, drive_hrs: 3.0},
-                {date: "Feb 28", location: "Christchurch", description: "RACE DAY - Christchurch Motorway Half Marathon", markerIndex: 5}
+                {date: "Feb 21 AM", location: "Christchurch", description: "Arrival - Pick up campervan from airport", markerIndex: 0, details: "Pick up your certified Green Warrant campervan. Hit a PAK'nSAVE supermarket to stock up on plant-based high-protein fuel (tofu, local peanut butter, oats, beans)."},
+                {date: "Feb 21 PM", location: "Lake Tekapo", description: "Drive to base camp - stunning turquoise waters", markerIndex: 1, drive_miles: 140, drive_hrs: 3.0, details: "Drive 3 hours inland to the stunning turquoise waters of Lake Tekapo. Perfect base for the week ahead."},
+                {date: "Feb 22", location: "Mt Sunday (Edoras)", description: "The Tussock Run - 1.5hr fast-hike to Golden Hall summit", markerIndex: 2, drive_miles: 45, drive_hrs: 1.0, details: "Drive to Mt. Sunday. Enjoy a light, scenic 1.5-hour fast-hike to the summit where the Golden Hall of Meduseld sat. Smooth, easy footing."},
+                {date: "Feb 23", location: "Mt Cook Village", description: "Hooker Valley Track (10km flat) - Jaw-dropping alpine views", markerIndex: 3, drive_miles: 35, drive_hrs: 0.75, details: "Drive to Mt. Cook Village. Walk the Hooker Valley Track (10km). Entirely flat on premium boardwalks, providing jaw-dropping alpine face views with zero joint strain."},
+                {date: "Feb 24-25", location: "Lake Tekapo", description: "Hydrate & Relax - Foam rolling, short 20min flat jogs", markerIndex: 4, drive_miles: 35, drive_hrs: 0.75, details: "Head back toward Christchurch. Spend these days relaxing by the lakes, foam rolling, and keeping your legs loose with short 20-minute flat jogs."},
+                {date: "Feb 26-27", location: "Christchurch", description: "Carbo-Loading - Collect race bib, prep gear", markerIndex: 5, drive_miles: 140, drive_hrs: 3.0, details: "Stay at a Holiday Park in Christchurch. Collect your race bib, prep your gear, and load up on clean carbs."},
+                {date: "Feb 28", location: "Christchurch", description: "🏃 RACE DAY - Christchurch Motorway Half Marathon", markerIndex: 5, details: "Run the Christchurch Motorway Half Marathon. Ultra-flat and fast. Use this to benchmark your 3:30 Manchester pacing (Target: ~1:39:00)."}
             ],
             2: [
-                {date: "Mar 1", location: "Te Anau", description: "Muscle Flush - Soak legs in lakeside hot tubs", markerIndex: 6, drive_miles: 310, drive_hrs: 5.0},
-                {date: "Mar 2 AM", location: "Milford Sound", description: "Fjord cruise - Towering waterfalls and sheer cliffs", markerIndex: 7, drive_miles: 75, drive_hrs: 2.0},
-                {date: "Mar 2 PM", location: "Te Anau", description: "Glowworm Caves - 12,000-year-old underground cave network", markerIndex: 8, drive_miles: 75, drive_hrs: 2.0},
-                {date: "Mar 3", location: "Kepler Track", description: "River Anduin - Flat 12km out-and-back run", markerIndex: 9, drive_miles: 30, drive_hrs: 0.5},
-                {date: "Mar 4", location: "Wanaka", description: "Roys Peak - 16km / 1,200m vertical gain (walk down slowly!)", markerIndex: 10, drive_miles: 75, drive_hrs: 1.5},
-                {date: "Mar 5 AM", location: "Paradise Forest", description: "Lothlórien woods walk", markerIndex: 11, drive_miles: 35, drive_hrs: 0.75},
-                {date: "Mar 5 PM", location: "Queenstown", description: "Arrive Queenstown - Fergburger dinner!", markerIndex: 12, drive_miles: 30, drive_hrs: 0.5},
-                {date: "Mar 6", location: "Queenstown", description: "THE PEAK ROAD RUN - 32km (20-mile) long slow distance", markerIndex: 12},
-                {date: "Mar 7", location: "Queenstown", description: "Ben Lomond Summit via Gondola Hack + sports massage", markerIndex: 12}
+                {date: "Mar 1", location: "Te Anau", description: "Muscle Flush - Soak legs in lakeside hot tubs", markerIndex: 6, drive_miles: 310, drive_hrs: 5.0, details: "Drive south to Te Anau (5 hours). Do not run. Soak your legs in local lakeside public hot tubs to flush out the race-day lactic acid."},
+                {date: "Mar 2 AM", location: "Milford Sound", description: "Fjord cruise - Towering waterfalls and sheer cliffs", markerIndex: 7, drive_miles: 75, drive_hrs: 2.0, details: "Take a majestic nature cruise through Milford Sound to see towering waterfalls and sheer fiord cliffs."},
+                {date: "Mar 2 PM", location: "Te Anau Glowworm Caves", description: "Underground cave network lit by bioluminescent glowworms", markerIndex: 8, drive_miles: 75, drive_hrs: 2.0, details: "Take a boat across Lake Te Anau into the Silent Glowworm Caves. Drifting through a 12,000-year-old underground cave network lit by thousands of bioluminescent glowworms requires zero physical effort but is deeply magical."},
+                {date: "Mar 3", location: "Kepler Track", description: "River Anduin - Flat 12km out-and-back run", markerIndex: 9, drive_miles: 30, drive_hrs: 0.5, details: "Run a flat 12km out-and-back section of the Kepler Track (The Anduin). Afterward, drive through Cromwell and stop at a fruit orchard for fresh cherries and a real-fruit vegan ice cream blended with a coconut-milk base."},
+                {date: "Mar 4", location: "Wanaka - Roys Peak", description: "VERTICAL STRENGTH - 16km / 1,200m gain", markerIndex: 10, drive_miles: 75, drive_hrs: 1.5, details: "Drive to Wanaka. Tackle the relentless Roys Peak Track (16km / 1,200m vertical gain).<br><strong>⚠️ Pacing Rule:</strong> Power-hike with high intent on the way up to build exceptional glute and lung power. At the top, click your photos, but on the descent, you must use trekking poles and walk down very slowly. Do not jog the downhill."},
+                {date: "Mar 5 AM", location: "Paradise Forest (Lothlórien)", description: "Gentle forest paths from LOTR film set", markerIndex: 11, drive_miles: 35, drive_hrs: 0.75, details: "Walk the gentle forest paths of Paradise Forest (Lothlórien film set)."},
+                {date: "Mar 5 PM", location: "Queenstown", description: "Arrive Queenstown - Fergburger dinner!", markerIndex: 12, drive_miles: 30, drive_hrs: 0.5, details: "Head into Queenstown for dinner. Skip the meat lines and order the \"Holier Than Thou\" plant-based burger (tempura tofu, spicy satay, avocado) from the world-famous Fergburger, and eat it on the lakefront with a local craft kombucha."},
+                {date: "Mar 6", location: "Queenstown Trail", description: "🏃 THE PEAK ROAD RUN - 32km (20-mile) LSD", markerIndex: 12, details: "Lock in your crucial 32km (20-mile) Manchester peak long run on the flat, smooth gravel of the Queenstown Trail network along the lake's edge.<br><strong>🏃‍♂️ Pacing Rule:</strong> Drop the 4:59/km target pace. Run this strictly as a Long Slow Distance (LSD) session at 5:30/km – 5:45/km. Keeping your heart rate in Zone 2 for 3 hours builds massive endurance and capillary density without triggering muscle damage."},
+                {date: "Mar 7", location: "Queenstown - Ben Lomond", description: "Summit via Gondola Hack + Sports Massage", markerIndex: 12, details: "Climb Ben Lomond directly from Queenstown.<br><strong>🚠 Travel Hack:</strong> Do not hike from the town center. Buy a ticket for the Skyline Gondola and take it up 450m to Bob's Peak, completely bypassing the brutal, steep forest slog. From the Gondola station, hike the beautiful alpine saddle to the summit. Take the Gondola back down.<br><strong>💆 Recovery Investment:</strong> Book a 60-90 minute sports massage in Queenstown this evening to flush out the 20-miler and prevent injury buildup."}
             ],
             3: [
-                {date: "Mar 8", location: "Haast Pass", description: "West Coast Transit - Blue Pools recovery stroll", markerIndex: 13, drive_miles: 90, drive_hrs: 2.0},
-                {date: "Mar 9", location: "Franz Josef", description: "Alex Knob Track - 17km / 1,100m through rainforest", markerIndex: 14, drive_miles: 75, drive_hrs: 1.5},
-                {date: "Mar 10 AM", location: "Punakaiki", description: "Pancake Rocks coastal loops", markerIndex: 15, drive_miles: 90, drive_hrs: 2.0},
-                {date: "Mar 10 PM", location: "Nelson", description: "Drive to Nelson - Rest & refuel", markerIndex: 16, drive_miles: 135, drive_hrs: 2.5},
-                {date: "Mar 11", location: "Abel Tasman", description: "THRESHOLD RUN - 25km coastal single-track", markerIndex: 17, drive_miles: 35, drive_hrs: 1.0},
-                {date: "Mar 12", location: "Nelson", description: "Rest & visit Jens Hansen Goldsmiths (Ring Maker)", markerIndex: 18, drive_miles: 35, drive_hrs: 1.0},
-                {date: "Mar 13 AM", location: "Picton", description: "Drive to Picton for ferry", markerIndex: 19, drive_miles: 65, drive_hrs: 1.5},
-                {date: "Mar 13 PM", location: "Wellington", description: "Arrive Wellington via Interislander Ferry (3.5 hours)", markerIndex: 20, drive_miles: null, drive_hrs: 3.5},
-                {date: "Mar 14", location: "Wellington", description: "Weta Workshop tour + Mt Victoria recovery jog", markerIndex: 20}
+                {date: "Mar 8", location: "Haast Pass - Blue Pools", description: "West Coast Transit - Active recovery stroll", markerIndex: 13, drive_miles: 90, drive_hrs: 2.0, details: "Drive the Haast Pass. Stop for a 1-hour active recovery stroll through the native forest to the crystalline Blue Pools."},
+                {date: "Mar 9", location: "Franz Josef", description: "Alex Knob Track - 17km / 1,100m through rainforest", markerIndex: 14, drive_miles: 75, drive_hrs: 1.5, details: "Arrive at Franz Josef Glacier. Hike Alex Knob (17km / 1,100m vertical gain).<br><strong>🥾 Pacing Rule:</strong> Treat this stunning trek through primeval rainforest entirely as a slow, immersive nature walk. Use your trekking poles to protect your joints, soaking in the glacier views without expanding any unnecessary running energy."},
+                {date: "Mar 10 AM", location: "Punakaiki", description: "Pancake Rocks - Flat, breezy ocean-side loops", markerIndex: 15, drive_miles: 90, drive_hrs: 2.0, details: "Drive north along the West Coast. Stop at Punakaiki (Pancake Rocks) for flat, breezy ocean-side loops."},
+                {date: "Mar 10 PM", location: "Nelson", description: "Drive to Nelson - Rest & refuel", markerIndex: 16, drive_miles: 135, drive_hrs: 2.5, details: "Continue to Nelson for rest and refueling."},
+                {date: "Mar 11", location: "Abel Tasman", description: "🏃 THRESHOLD RUN - 25km coastal single-track", markerIndex: 17, drive_miles: 35, drive_hrs: 1.0, details: "Take a water-taxi from Marahau out to Awaroa bay, then run 25km of coastal single-track back to your van. The relatively smooth terrain is perfect for practicing your sustained marathon threshold pace."},
+                {date: "Mar 12", location: "Nelson", description: "Rest & visit Jens Hansen Goldsmiths (Ring Maker)", markerIndex: 18, drive_miles: 35, drive_hrs: 1.0, details: "Rest your legs in Nelson. Visit Jens Hansen Goldsmiths to see the original movie rings, and relax at a local vegan-friendly café."},
+                {date: "Mar 13 AM", location: "Picton", description: "Drive to Picton for ferry", markerIndex: 19, drive_miles: 65, drive_hrs: 1.5, details: "Drive to Picton to catch the ferry."},
+                {date: "Mar 13 PM", location: "Cook Strait / Wellington", description: "Interislander Ferry crossing (3.5 hours)", markerIndex: 20, drive_miles: null, drive_hrs: 3.5, details: "Take the 3.5-hour Interislander Ferry across Cook Strait to Wellington."},
+                {date: "Mar 14", location: "Wellington", description: "Weta Workshop tour + Mt Victoria jog", markerIndex: 20, details: "Take a morning tour of Weta Workshop to see how the physical armor, swords, and creatures of Middle-earth were made. In the afternoon, do a light recovery jog through Mt. Victoria to find the \"Get off the road!\" Hobbit hideout."}
             ],
             4: [
-                {date: "Mar 15", location: "Putangirua Pinnacles", description: "Paths of the Dead - Fast-hike through eerie rock pillars", markerIndex: 21, drive_miles: 50, drive_hrs: 1.5},
-                {date: "Mar 16", location: "Tongariro", description: "Transit to Mordor - Drive Desert Road, set up camp", markerIndex: 22, drive_miles: 140, drive_hrs: 3.0},
-                {date: "Mar 17", location: "Tongariro Alpine Crossing", description: "Mt Doom - 19.4km crossing of volcanic craters (no running!)", markerIndex: 22},
-                {date: "Mar 18", location: "Taupo", description: "THE SKYDIVE - 15,000ft over Lake Taupo", markerIndex: 23, drive_miles: 30, drive_hrs: 0.5},
-                {date: "Mar 19", location: "Rotorua", description: "Redwoods 10km recovery run + Māori Hāngī dinner", markerIndex: 24, drive_miles: 50, drive_hrs: 1.0},
-                {date: "Mar 20", location: "Hobbiton (Matamata)", description: "The Shire - Movie set tour, Green Dragon ginger beer", markerIndex: 25, drive_miles: 40, drive_hrs: 1.0},
-                {date: "Mar 21", location: "Auckland", description: "Departure - Fly back to London, taper begins!", markerIndex: 26, drive_miles: 110, drive_hrs: 2.0}
+                {date: "Mar 15", location: "Putangirua Pinnacles", description: "Paths of the Dead - Fast-hike through eerie rock pillars", markerIndex: 21, drive_miles: 50, drive_hrs: 1.5, details: "Drive 2 hours south of Wellington to the Putangirua Pinnacles. Fast-hike the eerie rock pillars where Aragorn met the Army of the Dead."},
+                {date: "Mar 16", location: "Tongariro", description: "Transit to Mordor - Drive Desert Road", markerIndex: 22, drive_miles: 140, drive_hrs: 3.0, details: "Drive up the Desert Road with views of the volcanic peaks outside your window. Set up camp near Tongariro."},
+                {date: "Mar 17", location: "Tongariro Alpine Crossing", description: "🏔️ Mt Doom - 19.4km volcanic crossing", markerIndex: 22, details: "Fast-hike the world-famous Tongariro Alpine Crossing (19.4km). You will traverse volcanic craters, sulfur pools, and the base of Mt. Doom.<br><strong>🏔️ Pacing Rule:</strong> Strict \"No Running\" rule. The descent down the volcanic scree from Red Crater is highly unstable. Walk deliberately and use your trekking poles. This 6-hour hike provides massive late-stage mental toughness and structural leg endurance without ankle-sprain risks."},
+                {date: "Mar 18", location: "Taupo", description: "🪂 THE SKYDIVE - 15,000ft over Lake Taupo", markerIndex: 23, drive_miles: 30, drive_hrs: 0.5, details: "Drive to Taupo. Complete your 15,000ft Skydive over Lake Taupo with panoramic views of the Mordor volcanoes."},
+                {date: "Mar 19 AM", location: "Rotorua Redwoods", description: "🏃 10km recovery run through giant redwoods", markerIndex: 24, drive_miles: 50, drive_hrs: 1.0, details: "Take a flat 10km recovery run through the giant Whakarewarewa Redwood Forest in Rotorua."},
+                {date: "Mar 19 PM", location: "Te Puia, Rotorua", description: "Māori Culture - Haka performance & Hāngī dinner", markerIndex: 24, details: "Visit a living Māori village at Te Puia. Watch an authentic cultural performance (including the Haka) next to an erupting geyser, followed by a traditional Plant-Based Hāngī Buffet Dinner. Root vegetables like Kūmara (local sweet potato) and pumpkin are slow-cooked underground using geothermal steam."},
+                {date: "Mar 20", location: "Hobbiton (Matamata)", description: "🍺 The Shire - Movie set tour", markerIndex: 25, drive_miles: 40, drive_hrs: 1.0, details: "Drive to Matamata. Do the standard morning tour of the Hobbiton Movie Set. Celebrate the end of your journey with a complimentary premium ginger beer at the Green Dragon Inn."},
+                {date: "Mar 21", location: "Auckland Airport", description: "✈️ Departure - Fly back to London", markerIndex: 26, drive_miles: 110, drive_hrs: 2.0, details: "Drop off the van at Auckland Airport. Board your flight back to London. Wear compression socks, stay fully hydrated, and stretch every 2 hours on the plane to protect your legs as your official 4-week Manchester taper begins."}
             ]
         };
         
@@ -724,7 +767,7 @@
                     
                     var dayDate = document.createElement('div');
                     dayDate.className = 'day-date';
-                    dayDate.textContent = day.date + ' - ' + day.location;
+                    dayDate.innerHTML = day.date + ' - ' + day.location + '<span class="expand-icon">▼</span>';
                     
                     var dayLocation = document.createElement('div');
                     dayLocation.className = 'day-location';
@@ -733,8 +776,19 @@
                     dayItem.appendChild(dayDate);
                     dayItem.appendChild(dayLocation);
                     
-                    // Add click event
-                    dayItem.addEventListener('click', function() {
+                    // Add details section if available
+                    if (day.details) {
+                        var dayDetails = document.createElement('div');
+                        dayDetails.className = 'day-details';
+                        dayDetails.innerHTML = day.details;
+                        dayItem.appendChild(dayDetails);
+                    }
+                    
+                    // Add click event for expanding details
+                    dayItem.addEventListener('click', function(e) {
+                        // Toggle expanded state
+                        this.classList.toggle('expanded');
+                        
                         var markerIdx = parseInt(this.getAttribute('data-marker'));
                         highlightMarker(markerIdx);
                         
