@@ -590,12 +590,10 @@
         var legend = L.control({position: 'bottomright'});
         legend.onAdd = function(map) {
             var div = L.DomUtil.create('div', 'legend');
-            div.innerHTML = '<h4>4-Week NZ Itinerary</h4>';
-            div.innerHTML += '<div class="legend-item"><div class="legend-color" style="background: #ef4444;"></div>Week 1: Taper & Race (Feb 21-28)</div>';
+            div.innerHTML = '<div class="legend-item"><div class="legend-color" style="background: #ef4444;"></div>Week 1: Taper & Race (Feb 21-28)</div>';
             div.innerHTML += '<div class="legend-item"><div class="legend-color" style="background: #f59e0b;"></div>Week 2: Deep South (Mar 1-7)</div>';
             div.innerHTML += '<div class="legend-item"><div class="legend-color" style="background: #10b981;"></div>Week 3: West Coast (Mar 8-14)</div>';
             div.innerHTML += '<div class="legend-item"><div class="legend-color" style="background: #6366f1;"></div>Week 4: Mordor & Shire (Mar 15-21)</div>';
-            div.innerHTML += '<br><small>Click markers for details</small>';
             return div;
         };
         legend.addTo(map);
