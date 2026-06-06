@@ -345,6 +345,52 @@
             color: #10b981;
             font-weight: 700;
         }
+        
+        /* Mobile-Friendly Responsive Styles */
+        @media (max-width: 768px) {
+            #itinerary-panel {
+                width: 100vw;
+                transform: translateX(100vw);
+            }
+            
+            #map.with-panel {
+                width: 0;
+            }
+            
+            #panel-header {
+                padding: 16px;
+                font-size: 16px;
+            }
+            
+            #panel-content {
+                padding: 16px;
+            }
+            
+            .week-header {
+                font-size: 15px;
+                padding: 10px;
+            }
+            
+            .day-item {
+                padding: 10px;
+                margin: 6px 0;
+            }
+            
+            .day-date {
+                font-size: 13px;
+            }
+            
+            .day-location {
+                font-size: 12px;
+            }
+            
+            #toggle-panel {
+                right: 16px;
+                top: 16px;
+                padding: 10px 20px;
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
 <body>
