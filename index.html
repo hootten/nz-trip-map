@@ -398,6 +398,23 @@
             line-height: 1.6;
         }
         
+        .booking-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 14px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 14px;
+            transition: background 0.2s ease;
+        }
+        
+        .booking-link:hover {
+            background: #1e40af;
+        }
+        
         .booking-section-header {
             font-weight: 700;
             font-size: 14px;
@@ -684,7 +701,7 @@
         var legend = L.control({position: 'bottomright'});
         legend.onAdd = function(map) {
             var div = L.DomUtil.create('div', 'legend');
-            div.innerHTML = '<div class="legend-item"><div class="legend-color" style="background: #ef4444;"></div>Week 1: Taper & Race (Feb 21-28)</div>';
+            div.innerHTML = '<div class="legend-item"><div class="legend-color" style="background: #ef4444;"></div>Week 1: Taper & Race (Feb 20-28)</div>';
             div.innerHTML += '<div class="legend-item"><div class="legend-color" style="background: #f59e0b;"></div>Week 2: Deep South (Mar 1-7)</div>';
             div.innerHTML += '<div class="legend-item"><div class="legend-color" style="background: #10b981;"></div>Week 3: West Coast (Mar 8-14)</div>';
             div.innerHTML += '<div class="legend-item"><div class="legend-color" style="background: #6366f1;"></div>Week 4: Mordor & Shire (Mar 15-21)</div>';
@@ -698,12 +715,13 @@
         // Itinerary data from the initial-plan document
         var itineraryData = {
             1: [
-                {date: "Feb 21 AM", location: "Christchurch", description: "Arrival - Pick up campervan from airport", markerIndex: 0, details: "Pick up your certified Green Warrant campervan. Hit a PAK'nSAVE supermarket to stock up on plant-based high-protein fuel (tofu, local peanut butter, oats, beans)."},
-                {date: "Feb 21 PM", location: "Lake Tekapo", description: "Drive to base camp - stunning turquoise waters", markerIndex: 1, drive_miles: 140, drive_hrs: 3.0, details: "Drive 3 hours inland to the stunning turquoise waters of Lake Tekapo. Perfect base for the week ahead."},
-                {date: "Feb 22", location: "Mt Sunday (Edoras)", description: "The Tussock Run - 1.5hr fast-hike to Golden Hall summit", markerIndex: 2, drive_miles: 45, drive_hrs: 1.0, details: "Drive to Mt. Sunday. Enjoy a light, scenic 1.5-hour fast-hike to the summit where the Golden Hall of Meduseld sat. Smooth, easy footing."},
-                {date: "Feb 23", location: "Mt Cook Village", description: "Hooker Valley Track (10km flat) - Jaw-dropping alpine views", markerIndex: 3, drive_miles: 35, drive_hrs: 0.75, details: "Drive to Mt. Cook Village. Walk the Hooker Valley Track (10km). Entirely flat on premium boardwalks, providing jaw-dropping alpine face views with zero joint strain."},
-                {date: "Feb 24-25", location: "Lake Tekapo", description: "Hydrate & Relax - Foam rolling, short 20min flat jogs", markerIndex: 4, drive_miles: 35, drive_hrs: 0.75, details: "Head back toward Christchurch. Spend these days relaxing by the lakes, foam rolling, and keeping your legs loose with short 20-minute flat jogs."},
-                {date: "Feb 26-27", location: "Christchurch", description: "Carbo-Loading - Collect race bib, prep gear", markerIndex: 5, drive_miles: 140, drive_hrs: 3.0, details: "Stay at a Holiday Park in Christchurch. Collect your race bib, prep your gear, and load up on clean carbs."},
+                {date: "Feb 20", location: "London Heathrow", description: "✈️ Depart London - Singapore Airlines via Singapore", markerIndex: 0, details: "Depart LHR 10:40 (SQ317) via Singapore Changi, connecting to SQ295 into Christchurch. Total journey ~24hrs 10min with 1 stop."},
+                {date: "Feb 21 (EOD)", location: "Christchurch", description: "Arrival late evening (23:50) - overnight in Christchurch", markerIndex: 0, details: "Land at 23:50 after 2 flight legs. Campervan pickup deferred to the next morning - overnight near the airport rather than rushing straight to Tekapo."},
+                {date: "Feb 22 AM", location: "Christchurch → Lake Tekapo", description: "Pick up campervan, drive to base camp - stunning turquoise waters", markerIndex: 1, drive_miles: 140, drive_hrs: 3.0, details: "Pick up your certified Green Warrant campervan. Hit a PAK'nSAVE supermarket to stock up on plant-based high-protein fuel (tofu, local peanut butter, oats, beans). Drive 3 hours inland to the stunning turquoise waters of Lake Tekapo. Perfect base for the week ahead."},
+                {date: "Feb 23", location: "Mt Sunday (Edoras)", description: "The Tussock Run - 1.5hr fast-hike to Golden Hall summit", markerIndex: 2, drive_miles: 45, drive_hrs: 1.0, details: "Drive to Mt. Sunday. Enjoy a light, scenic 1.5-hour fast-hike to the summit where the Golden Hall of Meduseld sat. Smooth, easy footing."},
+                {date: "Feb 24", location: "Mt Cook Village", description: "Hooker Valley Track (10km flat) - Jaw-dropping alpine views", markerIndex: 3, drive_miles: 35, drive_hrs: 0.75, details: "Drive to Mt. Cook Village. Walk the Hooker Valley Track (10km). Entirely flat on premium boardwalks, providing jaw-dropping alpine face views with zero joint strain."},
+                {date: "Feb 25-26", location: "Lake Tekapo", description: "Hydrate & Relax - Foam rolling, short 20min flat jogs", markerIndex: 4, drive_miles: 35, drive_hrs: 0.75, details: "Head back toward Christchurch. Spend these days relaxing by the lakes, foam rolling, and keeping your legs loose with short 20-minute flat jogs."},
+                {date: "Feb 27", location: "Christchurch", description: "Carbo-Loading - Collect race bib, prep gear", markerIndex: 5, drive_miles: 140, drive_hrs: 3.0, details: "Stay at a Holiday Park in Christchurch. Collect your race bib, prep your gear, and load up on clean carbs."},
                 {date: "Feb 28", location: "Christchurch", description: "🏃 RACE DAY - Christchurch Motorway Half Marathon", markerIndex: 5, details: "Run the Christchurch Motorway Half Marathon. Ultra-flat and fast. Use this to benchmark your 3:30 Manchester pacing (Target: ~1:39:00)."}
             ],
             2: [
@@ -752,7 +770,7 @@
                 var weekHeader = document.createElement('div');
                 weekHeader.className = 'week-header week-' + week;
                 var weekTitles = {
-                    1: 'Week 1: Taper & Race (Feb 21-28)',
+                    1: 'Week 1: Taper & Race (Feb 20-28)',
                     2: 'Week 2: Deep South Magic (Mar 1-7)',
                     3: 'Week 3: Glaciers & Single-Track (Mar 8-14)',
                     4: 'Week 4: Mordor & The Shire (Mar 15-21)'
@@ -896,7 +914,7 @@
         // Booking checklist data
         var bookingTasks = [
             {date: "Aug 2026", title: "Enter the Race", details: "Register for Christchurch Motorway Half Marathon (Feb 28, 2027). Early-bird registration ~£38.", id: "race", cost: 38},
-            {date: "Sep 2026", title: "Book Flights", details: "Multi-city ticket: London → Christchurch, Auckland → London. Target: £1,350. Look for deals on Skyscanner.", id: "flights", cost: 1350},
+            {date: "Sep 2026", title: "Book Flights", details: "Singapore Airlines, 1 stop via Singapore (SQ317/SQ295 outbound, SQ286/SQ312 return). Depart LHR Feb 20 10:40, arrive CHC Feb 21 23:50. Depart AKL Mar 21 15:15, arrive LGW Mar 22 06:25. £1,383.", id: "flights", cost: 1383, link: "https://www.skyscanner.net/transport/d/lond/2027-02-20/chc/akl/2027-03-21/lond/config/13554-2702201040--31876-1-10501-2702212350%7C9393-2703211515--31876-1-13542-2703220625?adultsv2=1&cabinclass=economy&childrenv2=&ref=home"},
             {date: "Sep 2026", title: "Book Campervan", details: "28 days, 2-berth, Green Warrant certified van. Target: £1,800. Compare prices on Motorhome Republic.", id: "campervan", cost: 1800},
             {date: "Nov 2026", title: "Book Interislander Ferry", details: "Picton → Wellington (Mar 13, 2027). Northbound Saver fare for solo adult + campervan. ~£180.", id: "ferry", cost: 180},
             {date: "Dec 2026", title: "Pre-book Queenstown Campsites", details: "Holiday Parks for Mar 5-7. Queenstown fills up in late summer - book early!", id: "queenstown-camp", cost: 0},
@@ -997,6 +1015,20 @@
                 
                 bookingContent.appendChild(bookingTitle);
                 bookingContent.appendChild(bookingDetails);
+                
+                // Add a booking link button if one is provided
+                if (task.link) {
+                    var bookingLink = document.createElement('a');
+                    bookingLink.className = 'booking-link';
+                    bookingLink.href = task.link;
+                    bookingLink.target = '_blank';
+                    bookingLink.rel = 'noopener noreferrer';
+                    bookingLink.textContent = '🔗 Open booking link';
+                    bookingLink.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                    bookingContent.appendChild(bookingLink);
+                }
                 
                 bookingHeader.appendChild(checkbox);
                 bookingHeader.appendChild(bookingContent);
