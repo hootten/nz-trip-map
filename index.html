@@ -433,6 +433,219 @@
             font-weight: 700;
         }
         
+        /* Budget Tab Styles */
+        .budget-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .budget-card {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 14px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .budget-card.spent {
+            border-left-color: #10b981;
+        }
+        
+        .budget-card.remaining {
+            border-left-color: #f59e0b;
+        }
+        
+        .budget-card.adhoc {
+            border-left-color: #a855f7;
+        }
+        
+        .budget-card-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 6px;
+        }
+        
+        .budget-card-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        
+        .budget-section-title {
+            font-weight: 700;
+            font-size: 14px;
+            color: #2563eb;
+            margin: 22px 0 10px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #3b82f6;
+        }
+        
+        .budget-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            margin: 6px 0;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .budget-row.booked {
+            border-left: 3px solid #10b981;
+        }
+        
+        .budget-row.pending {
+            border-left: 3px solid #cbd5e1;
+        }
+        
+        .budget-row-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .budget-row-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: #0f172a;
+        }
+        
+        .budget-row-date {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        
+        .budget-row-status {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 6px;
+        }
+        
+        .budget-row-status.booked {
+            background: #d1fae5;
+            color: #047857;
+        }
+        
+        .budget-row-status.pending {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        
+        .budget-row-cost {
+            font-weight: 700;
+            font-size: 14px;
+            color: #0f172a;
+            white-space: nowrap;
+        }
+        
+        .budget-total-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 14px;
+            color: #0f172a;
+            padding: 10px 12px;
+            margin-top: 6px;
+            background: #eff6ff;
+            border-radius: 8px;
+        }
+        
+        #adhoc-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        
+        #adhoc-form input {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        
+        #adhoc-desc {
+            flex: 2 1 140px;
+        }
+        
+        #adhoc-amount {
+            flex: 1 1 80px;
+        }
+        
+        #adhoc-add-btn {
+            flex: 0 0 auto;
+            padding: 8px 16px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        #adhoc-add-btn:hover {
+            background: #1e40af;
+        }
+        
+        .adhoc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            margin: 6px 0;
+            background: #faf5ff;
+            border-left: 3px solid #a855f7;
+            border-radius: 8px;
+        }
+        
+        .adhoc-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .adhoc-item-desc {
+            font-weight: 600;
+            font-size: 13px;
+            color: #0f172a;
+        }
+        
+        .adhoc-item-date {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        
+        .adhoc-item-cost {
+            font-weight: 700;
+            font-size: 14px;
+            color: #0f172a;
+        }
+        
+        .adhoc-delete-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+        }
+        
+        .budget-empty {
+            color: #94a3b8;
+            font-size: 13px;
+            text-align: center;
+            padding: 14px;
+        }
+        
         /* Mobile-Friendly Responsive Styles */
         @media (max-width: 768px) {
             .legend {
@@ -516,6 +729,7 @@
         <div class="panel-tabs">
             <button class="panel-tab active" data-tab="itinerary">📅 Itinerary</button>
             <button class="panel-tab" data-tab="booking">✅ Booking Checklist</button>
+            <button class="panel-tab" data-tab="budget">💰 Budget</button>
         </div>
         <div id="panel-content">
             <div id="itinerary-content" class="tab-content active">
@@ -523,6 +737,9 @@
             </div>
             <div id="booking-content" class="tab-content">
                 <!-- Booking checklist will be populated by JavaScript -->
+            </div>
+            <div id="budget-content" class="tab-content">
+                <!-- Budget breakdown will be populated by JavaScript -->
             </div>
         </div>
     </div>
@@ -1001,6 +1218,7 @@
                         parentItem.classList.remove('completed');
                         localStorage.setItem('booking-' + task.id, 'false');
                     }
+                    populateBudget();
                 });
                 
                 var bookingContent = document.createElement('div');
@@ -1040,6 +1258,202 @@
         }
         
         populateBookingChecklist();
+        
+        // ---- Budget Tab ----
+        var ADHOC_STORAGE_KEY = 'nz-trip-adhoc-expenses';
+        
+        function getAdhocExpenses() {
+            try {
+                return JSON.parse(localStorage.getItem(ADHOC_STORAGE_KEY)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+        
+        function saveAdhocExpenses(expenses) {
+            localStorage.setItem(ADHOC_STORAGE_KEY, JSON.stringify(expenses));
+        }
+        
+        function formatGBP(amount) {
+            return '£' + amount.toLocaleString(undefined, {minimumFractionDigits: amount % 1 === 0 ? 0 : 2, maximumFractionDigits: 2});
+        }
+        
+        function isBooked(taskId) {
+            return localStorage.getItem('booking-' + taskId) === 'true';
+        }
+        
+        function populateBudget() {
+            var content = document.getElementById('budget-content');
+            content.innerHTML = '';
+            
+            var plannedTotal = 0;
+            var bookedTotal = 0;
+            bookingTasks.forEach(function(task) {
+                plannedTotal += task.cost;
+                if (isBooked(task.id)) {
+                    bookedTotal += task.cost;
+                }
+            });
+            
+            var adhocExpenses = getAdhocExpenses();
+            var adhocTotal = adhocExpenses.reduce(function(sum, e) { return sum + e.amount; }, 0);
+            var spentTotal = bookedTotal + adhocTotal;
+            var remaining = plannedTotal - bookedTotal;
+            
+            // Summary cards
+            var summary = document.createElement('div');
+            summary.className = 'budget-summary';
+            
+            function makeCard(label, value, cls) {
+                var card = document.createElement('div');
+                card.className = 'budget-card' + (cls ? ' ' + cls : '');
+                var lbl = document.createElement('div');
+                lbl.className = 'budget-card-label';
+                lbl.textContent = label;
+                var val = document.createElement('div');
+                val.className = 'budget-card-value';
+                val.textContent = value;
+                card.appendChild(lbl);
+                card.appendChild(val);
+                return card;
+            }
+            
+            summary.appendChild(makeCard('Planned Total', formatGBP(plannedTotal)));
+            summary.appendChild(makeCard('Spent So Far', formatGBP(spentTotal), 'spent'));
+            summary.appendChild(makeCard('Ad-hoc Expenses', formatGBP(adhocTotal), 'adhoc'));
+            summary.appendChild(makeCard('Remaining (Planned)', formatGBP(remaining), 'remaining'));
+            content.appendChild(summary);
+            
+            // Itinerary/checklist cost breakdown
+            var breakdownTitle = document.createElement('div');
+            breakdownTitle.className = 'budget-section-title';
+            breakdownTitle.textContent = '📋 Itinerary & Booking Costs';
+            content.appendChild(breakdownTitle);
+            
+            bookingTasks.forEach(function(task) {
+                var booked = isBooked(task.id);
+                var row = document.createElement('div');
+                row.className = 'budget-row ' + (booked ? 'booked' : 'pending');
+                
+                var info = document.createElement('div');
+                info.className = 'budget-row-info';
+                
+                var titleLine = document.createElement('div');
+                titleLine.className = 'budget-row-title';
+                titleLine.textContent = task.title;
+                
+                var statusBadge = document.createElement('span');
+                statusBadge.className = 'budget-row-status ' + (booked ? 'booked' : 'pending');
+                statusBadge.textContent = booked ? 'BOOKED' : 'PENDING';
+                titleLine.appendChild(statusBadge);
+                
+                var dateLine = document.createElement('div');
+                dateLine.className = 'budget-row-date';
+                dateLine.textContent = task.date;
+                
+                info.appendChild(titleLine);
+                info.appendChild(dateLine);
+                
+                var costEl = document.createElement('div');
+                costEl.className = 'budget-row-cost';
+                costEl.textContent = task.cost > 0 ? formatGBP(task.cost) : 'TBD';
+                
+                row.appendChild(info);
+                row.appendChild(costEl);
+                content.appendChild(row);
+            });
+            
+            var plannedTotalRow = document.createElement('div');
+            plannedTotalRow.className = 'budget-total-row';
+            plannedTotalRow.innerHTML = '<span>Planned Total</span><span>' + formatGBP(plannedTotal) + '</span>';
+            content.appendChild(plannedTotalRow);
+            
+            // Ad-hoc expenses section
+            var adhocTitle = document.createElement('div');
+            adhocTitle.className = 'budget-section-title';
+            adhocTitle.textContent = '🧾 Ad-hoc Expenses';
+            content.appendChild(adhocTitle);
+            
+            var form = document.createElement('div');
+            form.id = 'adhoc-form';
+            form.innerHTML =
+                '<input type="text" id="adhoc-desc" placeholder="Description (e.g. Fuel, Groceries)">' +
+                '<input type="number" id="adhoc-amount" placeholder="£ Amount" step="0.01" min="0">' +
+                '<button id="adhoc-add-btn">+ Add</button>';
+            content.appendChild(form);
+            
+            if (adhocExpenses.length === 0) {
+                var empty = document.createElement('div');
+                empty.className = 'budget-empty';
+                empty.textContent = 'No ad-hoc expenses added yet.';
+                content.appendChild(empty);
+            } else {
+                adhocExpenses.forEach(function(expense) {
+                    var item = document.createElement('div');
+                    item.className = 'adhoc-item';
+                    
+                    var info = document.createElement('div');
+                    info.className = 'adhoc-item-info';
+                    
+                    var desc = document.createElement('div');
+                    desc.className = 'adhoc-item-desc';
+                    desc.textContent = expense.description;
+                    
+                    var dateEl = document.createElement('div');
+                    dateEl.className = 'adhoc-item-date';
+                    dateEl.textContent = expense.date;
+                    
+                    info.appendChild(desc);
+                    info.appendChild(dateEl);
+                    
+                    var costEl = document.createElement('div');
+                    costEl.className = 'adhoc-item-cost';
+                    costEl.textContent = formatGBP(expense.amount);
+                    
+                    var deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'adhoc-delete-btn';
+                    deleteBtn.textContent = '✕';
+                    deleteBtn.addEventListener('click', function() {
+                        var expenses = getAdhocExpenses().filter(function(e) { return e.id !== expense.id; });
+                        saveAdhocExpenses(expenses);
+                        populateBudget();
+                    });
+                    
+                    item.appendChild(info);
+                    item.appendChild(costEl);
+                    item.appendChild(deleteBtn);
+                    content.appendChild(item);
+                });
+                
+                var adhocTotalRow = document.createElement('div');
+                adhocTotalRow.className = 'budget-total-row';
+                adhocTotalRow.innerHTML = '<span>Ad-hoc Total</span><span>' + formatGBP(adhocTotal) + '</span>';
+                content.appendChild(adhocTotalRow);
+            }
+            
+            document.getElementById('adhoc-add-btn').addEventListener('click', function() {
+                var descInput = document.getElementById('adhoc-desc');
+                var amountInput = document.getElementById('adhoc-amount');
+                var description = descInput.value.trim();
+                var amount = parseFloat(amountInput.value);
+                
+                if (!description || isNaN(amount) || amount <= 0) {
+                    return;
+                }
+                
+                var expenses = getAdhocExpenses();
+                expenses.push({
+                    id: 'adhoc-' + Date.now(),
+                    description: description,
+                    amount: amount,
+                    date: new Date().toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'})
+                });
+                saveAdhocExpenses(expenses);
+                populateBudget();
+            });
+        }
+        
+        populateBudget();
         
         // Tab switching functionality
         document.querySelectorAll('.panel-tab').forEach(function(tab) {
